@@ -1,0 +1,4 @@
+espn-api
+streamlit
+pandas
+plotly
