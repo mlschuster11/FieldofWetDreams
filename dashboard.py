@@ -1,10 +1,29 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from espn_config import PASSWORD
+
+def check_password():
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if not st.session_state.authenticated:
+        st.title("⚾ ESPN Fantasy Baseball Dashboard")
+        pwd = st.text_input("Enter league password:", type="TunaCanChode")
+        if st.button("Login"):
+            if pwd == PASSWORD:
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Incorrect password")
+        st.stop()
+
+check_password()
 from data_fetcher import (
     get_league, get_standings, get_hitting_stats, get_pitching_stats,
     get_matchup_results, get_strength_of_schedule, get_weekly_scores,
 )
+
+
 
 st.set_page_config(page_title="ESPN Fantasy Baseball Dashboard", page_icon="⚾", layout="wide")
 st.title("⚾ ESPN Fantasy Baseball Dashboard")
