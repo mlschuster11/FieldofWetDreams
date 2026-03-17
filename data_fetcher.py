@@ -142,3 +142,34 @@ def get_weekly_scores(league):
         except Exception:
             pass
     return pd.DataFrame(rows)
+
+def get_roster_stats(league):
+    """Return player stats for all teams."""
+    rows = []
+    for team in league.teams:
+        for player in team.roster:
+            proj = player.stats.get(0, {}).get('projected_breakdown', {})
+            rows.append({
+                "Team": team.team_name,
+                "Player": player.name,
+                "Position": player.position,
+                "Pro Team": player.proTeam,
+                "Status": player.injuryStatus,
+                "% Owned": round(player.percent_owned, 1),
+                "AB": proj.get('AB', 0),
+                "AVG": proj.get('AVG', 0),
+                "HR": proj.get('HR', 0),
+                "RBI": proj.get('RBI', 0),
+                "R": proj.get('R', 0),
+                "SB": proj.get('SB', 0),
+                "OBP": proj.get('OBP', 0),
+                "SLG": proj.get('SLG', 0),
+                "OPS": proj.get('OPS', 0),
+                "K (pitcher)": proj.get('K', 0),
+                "W": proj.get('W', 0),
+                "SV": proj.get('SV', 0),
+                "ERA": proj.get('ERA', 0),
+                "WHIP": proj.get('WHIP', 0),
+                "QS": proj.get('QS', 0),
+            })
+    return pd.DataFrame(rows).fillna(0)

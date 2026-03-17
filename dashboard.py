@@ -26,6 +26,7 @@ check_password()
 from data_fetcher import (
     get_league, get_standings, get_hitting_stats, get_pitching_stats,
     get_matchup_results, get_strength_of_schedule, get_weekly_scores,
+    get_roster_stats,
 )
 
 st.title("⚾ ESPN Fantasy Baseball Dashboard")
@@ -41,6 +42,8 @@ def load_all_data():
         "matchups": get_matchup_results(league),
         "sos": get_strength_of_schedule(league),
         "weekly_scores": get_weekly_scores(league),
+	"rosters": get_roster_stats(league),
+
     }
 
 try:
@@ -52,7 +55,7 @@ except Exception as e:
 league = data["league"]
 st.success(f"✅ Connected to **{league.settings.name}** — Week {league.current_week - 1} complete")
 
-tabs = st.tabs(["🏆 Standings", "🏏 Hitting", "⚡ Pitching", "🤝 Head-to-Head", "📅 Weekly Scores", "💪 Strength of Schedule"])
+tabs = st.tabs(["🏆 Standings", "🏏 Hitting", "⚡ Pitching", "🤝 Head-to-Head", "📅 Weekly Scores", "💪 Strength of Schedule", "👤 Rosters"])
 
 with tabs[0]:
     st.subheader("League Standings")
@@ -130,3 +133,29 @@ with tabs[5]:
                       color="Own Win%", color_continuous_scale="RdYlGn")
     fig2.update_traces(textposition="top center")
     st.plotly_chart(fig2, use_container_width=True)
+with tabs[6]:
+    st.subheader("Rosters & Player Stats (Projected)")
+    df = data["rosters"]
+
+    teams_list = ["All"] + sorted(df["Team"].unique())
+    selected_team = st.selectbox("Filter by team:", teams_list)
+    positions = ["All"] + sorted(df["Position"].unique())
+    selected_pos = st.selectbox("Filter by position:", positions)
+
+    filtered = df.copy()
+    if selected_team != "All":
+        filtered = filtered[filtered["Team"] == selected_team]
+    if selected_pos != "All":
+        filtered = filtered[filtered["Position"] == selected_pos]
+
+    st.dataframe(filtered, use_container_width=True, hide_index=True)
+
+    st.subheader("Top Players by Stat")
+    stat_cols = ["HR", "RBI", "R", "SB", "OPS", "ERA", "WHIP", "K (pitcher)", "SV", "QS"]
+    selected_stat = st.selectbox("Rank players by:", stat_cols)
+    ascending = selected_stat in ["ERA", "WHIP"]
+    top_df = df[df[selected_stat] > 0].sort_values(selected_stat, ascending=ascending).head(20)
+    fig = px.bar(top_df, x="Player", y=selected_stat, color="Team",
+                 title=f"Top 20 Players by {selected_stat}")
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
