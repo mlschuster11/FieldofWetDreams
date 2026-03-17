@@ -1,9 +1,14 @@
-# ESPN Fantasy Baseball Configuration
-# Fill in your credentials below
+import streamlit as st
 
-LEAGUE_ID = 76145          # Replace with your League ID (from the URL)
-YEAR = 2026                # Season year
-
-ESPN_S2 = "AEB6%2BHWUG37Y6icVT9cus7%2FD01nXp8mjCA8HVCbHu%2BvZIG2NMiacDHDBhrljiRLkdYaOJmKj753shPrylepp0zB1fq8H8w6bc999IqVmDPiZ5qTUFTpBDST1OKt1ENHx%2BRmE0zF5fSIM7qtBMlt%2BBbCYXAmo5lo4sQDDYMTNIAtd9PByNSRiTDgglj8oIfqtwCJTYIcyXAV6iRCKaTJfxseehfFYVhZXAH%2BQS1TlLvIoUkMNrpwl9pmARztcAFUHNICnjiFpkNFP8Eo7MM%2F6gEVDVNYVnyCds2KXGtQSUW7Mydy1r2wWuBF0dipwv%2Fu8Avw%3D"
-SWID = "{2040CD6B-9CFC-4C88-814E-11EF25E37A14}"
-PASSWORD = st.secrets["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"]
+try:
+    LEAGUE_ID = st.secrets["LEAGUE_ID"]
+    YEAR = st.secrets["YEAR"]
+    ESPN_S2 = st.secrets["ESPN_S2"]
+    SWID = st.secrets["SWID"]
+    PASSWORD = st.secrets["PASSWORD"]
+except:
+    LEAGUE_ID = 76145
+    YEAR = 2026
+    ESPN_S2 = "AEB6%2BHWUG37Y6icVT9cus7%2FD01nXp8mjCA8HVCbHu%2BvZIG2NMiacDHDBhrljiRLkdYaOJmKj753shPrylepp0zB1fq8H8w6bc999IqVmDPiZ5qTUFTpBDST1OKt1ENHx%2BRmE0zF5fSIM7qtBMlt%2BBbCYXAmo5lo4sQDDYMTNIAtd9PByNSRiTDgglj8oIfqtwCJTYIcyXAV6iRCKaTJfxseehfFYVhZXAH%2BQS1TlLvIoUkMNrpwl9pmARztcAFUHNICnjiFpkNFP8Eo7MM%2F6gEVDVNYVnyCds2KXGtQSUW7Mydy1r2wWuBF0dipwv%2Fu8Avw%3D"
+    SWID = "{2040CD6B-9CFC-4C88-814E-11EF25E37A14}"
+    PASSWORD = "TunaCanChode
