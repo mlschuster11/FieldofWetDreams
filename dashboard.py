@@ -26,7 +26,7 @@ check_password()
 from data_fetcher import (
     get_league, get_standings, get_hitting_stats, get_pitching_stats,
     get_matchup_results, get_strength_of_schedule, get_weekly_scores,
-    get_roster_stats,
+    get_roster_stats, get_projected_totals,
 )
 
 st.title("⚾ ESPN Fantasy Baseball Dashboard")
@@ -43,6 +43,8 @@ def load_all_data():
         "sos": get_strength_of_schedule(league),
         "weekly_scores": get_weekly_scores(league),
 	"rosters": get_roster_stats(league),
+        "projected": get_projected_totals(league),
+
 
     }
 
@@ -55,7 +57,7 @@ except Exception as e:
 league = data["league"]
 st.success(f"✅ Connected to **{league.settings.name}** — Week {league.current_week - 1} complete")
 
-tabs = st.tabs(["🏆 Standings", "🏏 Hitting", "⚡ Pitching", "🤝 Head-to-Head", "📅 Weekly Scores", "💪 Strength of Schedule", "👤 Rosters"])
+tabs = st.tabs(["🏆 Standings", "🏏 Hitting", "⚡ Pitching", "🤝 Head-to-Head", "📅 Weekly Scores", "💪 Strength of Schedule", "👤 Rosters", "📊 Projected Totals"])
 
 with tabs[0]:
     st.subheader("League Standings")
@@ -158,4 +160,18 @@ with tabs[6]:
     fig = px.bar(top_df, x="Player", y=selected_stat, color="Team",
                  title=f"Top 20 Players by {selected_stat}")
     fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
+with tabs[7]:
+    st.subheader("Projected Season Totals by Team")
+    st.caption("Based on ESPN projected stats for all rostered players.")
+    df = data["projected"]
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    stat_cols = ["HR", "RBI", "R", "SB", "K (pitcher)", "W", "SV", "QS"]
+    selected_stat = st.selectbox("Visualize projected stat:", stat_cols, key="proj_stat")
+    fig = px.bar(df.sort_values(selected_stat, ascending=False),
+                 x="Team", y=selected_stat,
+                 title=f"Projected {selected_stat} by Team",
+                 color=selected_stat, color_continuous_scale="Blues")
+    fig.update_layout(xaxis_tickangle=-30)
     st.plotly_chart(fig, use_container_width=True)

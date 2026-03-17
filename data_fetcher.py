@@ -173,3 +173,33 @@ def get_roster_stats(league):
                 "QS": proj.get('QS', 0),
             })
     return pd.DataFrame(rows).fillna(0)
+def get_projected_totals(league):
+    """Return projected season totals for each team by summing player projections."""
+    hitting_stats = ["HR", "RBI", "R", "SB", "AB"]
+    pitching_stats = ["K (pitcher)", "W", "SV", "QS"]
+    rate_stats = ["AVG", "OBP", "SLG", "OPS", "ERA", "WHIP"]
+
+    rows = []
+    for team in league.teams:
+        row = {"Team": team.team_name}
+        for stat in hitting_stats + pitching_stats:
+            row[stat] = 0
+        for player in team.roster:
+            proj = player.stats.get(0, {}).get('projected_breakdown', {})
+            row["HR"] += proj.get('HR', 0) or 0
+            row["RBI"] += proj.get('RBI', 0) or 0
+            row["R"] += proj.get('R', 0) or 0
+            row["SB"] += proj.get('SB', 0) or 0
+            row["AB"] += proj.get('AB', 0) or 0
+            row["K (pitcher)"] += proj.get('K', 0) or 0
+            row["W"] += proj.get('W', 0) or 0
+            row["SV"] += proj.get('SV', 0) or 0
+            row["QS"] += proj.get('QS', 0) or 0
+
+        # Round counting stats
+        for stat in hitting_stats + pitching_stats:
+            row[stat] = round(row[stat], 1)
+
+        rows.append(row)
+
+    return pd.DataFrame(rows).sort_values("HR", ascending=False)
