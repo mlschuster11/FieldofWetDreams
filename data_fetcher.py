@@ -9,6 +9,8 @@ def get_primary_position(player):
         return 'SP'
     if 'RP' in slots:
         return 'RP'
+    if 'P' in slots:
+        return 'P'
     if 'C' in slots:
         return 'C'
     if '1B' in slots:
