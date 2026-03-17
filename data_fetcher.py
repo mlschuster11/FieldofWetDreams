@@ -10,7 +10,6 @@ def get_standings(league):
     for team in league.teams:
         rows.append({
             "Team": team.team_name,
-            "Owner": str(team.owners),
             "Wins": team.wins,
             "Losses": team.losses,
             "Ties": team.ties,
