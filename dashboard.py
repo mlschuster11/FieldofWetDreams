@@ -1,4 +1,3 @@
-cat > ~/Downloads/dashboard.py << 'EOF'
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -65,4 +64,68 @@ with tabs[0]:
     with col2:
         fig2 = px.bar(df, x="Team", y="Win %", title="Win % by Team",
                       color="Win %", color_continuous_scale="RdYlGn")
-        fig2.update_layout(xaxis_tickangle
+        fig2.update_layout(xaxis_tickangle=-30)
+        st.plotly_chart(fig2, use_container_width=True)
+
+with tabs[1]:
+    st.subheader("Team Hitting Statistics")
+    df = data["hitting"]
+    st.dataframe(df, use_container_width=True, hide_index=True)
+    hit_cols = [c for c in ["HR", "RBI", "R", "SB", "AVG", "OPS"] if c in df.columns]
+    selected = st.selectbox("Visualize stat:", hit_cols)
+    fig = px.bar(df.sort_values(selected, ascending=False), x="Team", y=selected, color=selected, color_continuous_scale="Blues")
+    st.plotly_chart(fig, use_container_width=True)
+
+with tabs[2]:
+    st.subheader("Team Pitching Statistics")
+    df = data["pitching"]
+    st.dataframe(df, use_container_width=True, hide_index=True)
+    pitch_cols = [c for c in ["ERA", "WHIP", "K", "W", "SV", "QS"] if c in df.columns]
+    selected_p = st.selectbox("Visualize stat:", pitch_cols)
+    ascending = selected_p in ["ERA", "WHIP"]
+    fig = px.bar(df.sort_values(selected_p, ascending=ascending), x="Team", y=selected_p, color=selected_p,
+                 color_continuous_scale="RdYlGn_r" if ascending else "RdYlGn")
+    st.plotly_chart(fig, use_container_width=True)
+
+with tabs[3]:
+    st.subheader("Head-to-Head Matchup Results")
+    df = data["matchups"]
+    if df.empty:
+        st.info("No completed matchups found yet.")
+    else:
+        weeks = sorted(df["Week"].unique())
+        selected_week = st.selectbox("Filter by week:", ["All"] + [str(w) for w in weeks])
+        display_df = df if selected_week == "All" else df[df["Week"] == int(selected_week)]
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+with tabs[4]:
+    st.subheader("Weekly Score Trends")
+    df = data["weekly_scores"]
+    if df.empty:
+        st.info("No weekly score data available yet.")
+    else:
+        teams_all = sorted(df["Team"].unique())
+        selected_teams = st.multiselect("Show teams:", teams_all, default=teams_all)
+        fig = px.line(df[df["Team"].isin(selected_teams)], x="Week", y="Score", color="Team", markers=True)
+        st.plotly_chart(fig, use_container_width=True)
+
+with tabs[5]:
+    st.subheader("Strength of Schedule")
+    st.caption("Stats shown are averages of what each team faced from opponents across all matchups.")
+    df = data["sos"]
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
+    st.subheader("Opponent Stats Faced")
+    against_cols = [c for c in df.columns if "Against" in c]
+    selected_sos = st.selectbox("Visualize stat faced:", against_cols)
+    fig = px.bar(df.sort_values(selected_sos, ascending=False), x="Team", y=selected_sos,
+                 title=f"Avg {selected_sos} by Team",
+                 color=selected_sos, color_continuous_scale="Reds")
+    fig.update_layout(xaxis_tickangle=-30)
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("Overall Strength of Schedule")
+    fig2 = px.scatter(df, x="SoS (Avg Opp Win%)", y="Own Win%", text="Team",
+                      color="Own Win%", color_continuous_scale="RdYlGn")
+    fig2.update_traces(textposition="top center")
+    st.plotly_chart(fig2, use_container_width=True)
