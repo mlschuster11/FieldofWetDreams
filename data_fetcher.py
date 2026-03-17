@@ -2,6 +2,31 @@ from espn_api.baseball import League
 import pandas as pd
 from espn_config import LEAGUE_ID, YEAR, ESPN_S2, SWID
 
+def get_primary_position(player):
+    """Derive primary position from eligibleSlots."""
+    slots = player.eligibleSlots
+    if 'SP' in slots:
+        return 'SP'
+    if 'RP' in slots:
+        return 'RP'
+    if 'C' in slots:
+        return 'C'
+    if '1B' in slots:
+        return '1B'
+    if '2B' in slots:
+        return '2B'
+    if '3B' in slots:
+        return '3B'
+    if 'SS' in slots:
+        return 'SS'
+    if 'CF' in slots:
+        return 'CF'
+    if 'OF' in slots:
+        return 'OF'
+    if 'DH' in slots:
+        return 'DH'
+    return slots[0] if slots else 'Unknown'
+
 def get_league():
     return League(league_id=LEAGUE_ID, year=YEAR, espn_s2=ESPN_S2, swid=SWID)
 
@@ -152,7 +177,7 @@ def get_roster_stats(league):
             rows.append({
                 "Team": team.team_name,
                 "Player": player.name,
-                "Position": player.position,
+                "Position": get_primary_position(player),
                 "Pro Team": player.proTeam,
                 "Status": player.injuryStatus,
                 "% Owned": round(player.percent_owned, 1),
