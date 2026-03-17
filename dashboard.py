@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import sys
+sys.path.insert(0, '/mount/src/fieldofwetdreams')
 
 st.set_page_config(page_title="ESPN Fantasy Baseball Dashboard", page_icon="⚾", layout="wide")
-
-from espn_config import PASSWORD
 
 def check_password():
     if "authenticated" not in st.session_state:
@@ -13,6 +13,7 @@ def check_password():
         st.title("⚾ ESPN Fantasy Baseball Dashboard")
         pwd = st.text_input("Enter league password:", type="password")
         if st.button("Login"):
+            from espn_config import PASSWORD
             if pwd == PASSWORD:
                 st.session_state.authenticated = True
                 st.rerun()
